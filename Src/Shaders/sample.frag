@@ -95,11 +95,11 @@ void main(){
 	if (all(greaterThan(tex, vec4(0.f))))
 		FragColor *= tex;
 
-	// // if there is a point light, apply it
+	// if there is a point light, apply it
 	if (any(greaterThan(point.xyz, vec3(0.f))))
 		light += point;
 		
-	// // if there is a direction light, apply it
+	// if there is a direction light, apply it
 	if (any(greaterThan(dir.xyz, vec3(0.f))))
 		light += dir;
 
