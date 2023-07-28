@@ -74,12 +74,12 @@ void main(){
 		FragColor *= tex;
 
 	// if there is a direction light, apply it
-	if (any(greaterThan(dir.xyz, vec3(0.f))))
-		FragColor *= dir;
+	// if (any(greaterThan(dir.xyz, vec3(0.f))))
+	// 	FragColor *= dir;
 
 	// if there is a point light, apply it
-	if (any(greaterThan(point.xyz, vec3(0.f))))
-		FragColor *= point;
+	// if (any(greaterThan(point.xyz, vec3(0.f))))
+	// 	FragColor *= point;
 	
 	// if there's any changes to the colors, apply it
 	if (any(lessThan(rgba.xyz, vec3(1.f))))
