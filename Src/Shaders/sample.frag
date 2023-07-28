@@ -51,6 +51,17 @@ uniform PointLight pointLight;
 vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
 vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir); 
 
+float getFogFactor(float d)
+{
+    const float FogMax = 20.0;
+    const float FogMin = 10.0;
+
+    if (d>=FogMax) return 1;
+    if (d<=FogMin) return 0;
+
+    return 1 - (FogMax - d) / (FogMax - FogMin);
+}
+
 void main(){
 	//				     r     g      b      a
 	// FragColor = vec4(1.0f, 0.72f, 0.77f, 1.0f);
@@ -68,7 +79,17 @@ void main(){
 	vec4 light = vec4(0.f);
 	FragColor = vec4(1.f); // initialize fragColor to 1.f in case nothing gets applied
 
-	// if any of the following vec4s are 0, the model becomes invisible
+	float d = distance(cameraPos, fragPos);
+	float alpha = getFogFactor(d);
+	float fog_start = 5.f;
+	float fog_end = 50.f;
+
+	// if (d > fog_end)
+	// 	discard;
+
+	//linear interpolation
+	float fog_factor = (d - fog_start) / ( fog_end - fog_start);
+	fog_factor = clamp(fog_factor, 0, 1);
 
 	// if there is a texture, apply it
 	if (all(greaterThan(tex, vec4(0.f))))
@@ -89,6 +110,7 @@ void main(){
 	if (any(lessThan(rgba.xyz, vec3(1.f))))
 		FragColor *= rgba;
 
+	FragColor = mix(vec4(0.02f, 0.02f, 0.05f, 1.f), FragColor, 1.f - fog_factor);
 	// FragColor *= vec4(0.f, 1.f, 0.f, 1.f); // simple nightvision
 }
 

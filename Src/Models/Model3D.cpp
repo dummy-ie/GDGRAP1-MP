@@ -141,7 +141,7 @@ Model3D::Model3D(std::string modelPath, std::string texturePath, vec3 color, vec
 
         // GLuint texture;
         glGenTextures(1, &texture);
-        glActiveTexture(GL_TEXTURE0);
+        // glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -188,7 +188,7 @@ void Model3D::draw(GLuint &shaderProgram)
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transformation_matrix));
 
     GLuint tex0Address = glGetUniformLocation(shaderProgram, "tex0");
-    glActiveTexture(GL_TEXTURE0);
+    // glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glUniform1i(tex0Address, 0);
 

@@ -502,6 +502,9 @@ int main(void)
 
         glUseProgram(shaderProgram);
 
+        unsigned int cameraPosLoc = glGetUniformLocation(shaderProgram, "cameraPos");
+        glUniform3fv(cameraPosLoc, 1, glm::value_ptr(currentCamera->position));
+
         // update uniforms for both lights
         directionLight->applyUniforms(shaderProgram);
         directionLight->applyExtraUniforms(shaderProgram);

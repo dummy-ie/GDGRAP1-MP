@@ -22,7 +22,7 @@ namespace gd
 
     mat4 PerspectiveCamera::generateProjectionMatrix()
     {
-        return perspective(radians(fov), height / width, 0.1f, 100.f);
+        return perspective(radians(fov), height / width, 0.1f, 300.f);
     }
     
 } // namespace gd
