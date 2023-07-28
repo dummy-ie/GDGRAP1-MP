@@ -65,6 +65,7 @@ void main(){
 	vec4 dir = CalcDirLight(dirLight, normal, viewDir);
 	vec4 point = CalcPointLight(pointLight, normal, fragPos, viewDir);
 
+	vec4 light = vec4(0.f);
 	FragColor = vec4(1.f); // initialize fragColor to 1.f in case nothing gets applied
 
 	// if any of the following vec4s are 0, the model becomes invisible
@@ -73,13 +74,16 @@ void main(){
 	if (all(greaterThan(tex, vec4(0.f))))
 		FragColor *= tex;
 
-	// if there is a direction light, apply it
-	// if (any(greaterThan(dir.xyz, vec3(0.f))))
-	// 	FragColor *= dir;
+	// // if there is a point light, apply it
+	if (any(greaterThan(point.xyz, vec3(0.f))))
+		light += point;
+		
+	// // if there is a direction light, apply it
+	if (any(greaterThan(dir.xyz, vec3(0.f))))
+		light += dir;
 
-	// if there is a point light, apply it
-	// if (any(greaterThan(point.xyz, vec3(0.f))))
-	// 	FragColor *= point;
+	if (any(greaterThan(light.xyz, vec3(0.f))))
+		FragColor *= light;
 	
 	// if there's any changes to the colors, apply it
 	if (any(lessThan(rgba.xyz, vec3(1.f))))

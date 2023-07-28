@@ -35,6 +35,7 @@ static float height = 600.f;
 static float width = 600.f;
 
 // increment to rotate the models by
+static float positionIncrement = 1.f;
 static float rotationIncrement = 5.f;
 
 // global pointers for both cameras
@@ -147,7 +148,7 @@ static void Key_Callback(
         }
         else
         {
-            mainModel->rotation.x -= rotationIncrement;
+            mainModel->position.z += positionIncrement;
         }
     }
 
@@ -161,64 +162,64 @@ static void Key_Callback(
         }
         else
         {
-            mainModel->rotation.x += rotationIncrement;
+            mainModel->position.z -= positionIncrement;
         }
     }
 
     // z axis rotation
-    if (key == GLFW_KEY_E && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    {
-        if (controlLight)
-        {
-            lightModel->rotation.z -= rotationIncrement;
+    // if (key == GLFW_KEY_E && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    // {
+    //     if (controlLight)
+    //     {
+    //         lightModel->rotation.z -= rotationIncrement;
 
-            updateLightPosition();
-        }
-        else
-        {
-            mainModel->rotation.z -= rotationIncrement;
-        }
-    }
+    //         updateLightPosition();
+    //     }
+    //     else
+    //     {
+    //         mainModel->position.z -= positionIncrement;
+    //     }
+    // }
 
-    if (key == GLFW_KEY_Q && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    {
-        if (controlLight)
-        {
-            lightModel->rotation.z += rotationIncrement;
+    // if (key == GLFW_KEY_Q && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    // {
+    //     if (controlLight)
+    //     {
+    //         lightModel->rotation.z += rotationIncrement;
 
-            updateLightPosition();
-        }
-        else
-        {
-            mainModel->rotation.z += rotationIncrement;
-        }
-    }
+    //         updateLightPosition();
+    //     }
+    //     else
+    //     {
+    //         mainModel->position.z += positionIncrement;
+    //     }
+    // }
 
     // direction light brightness
-    if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
-    {
-        directionLight->ambientStr += 0.1f;
-        directionLight->specStr += 0.1f;
-    }
+    // if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
+    // {
+    //     directionLight->ambientStr += 0.1f;
+    //     directionLight->specStr += 0.1f;
+    // }
 
-    if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
-    {
-        directionLight->ambientStr -= 0.1f;
-        directionLight->specStr -= 0.1f;
-    }
+    // if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
+    // {
+    //     directionLight->ambientStr -= 0.1f;
+    //     directionLight->specStr -= 0.1f;
+    // }
 
-    // point light brightness
-    if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
-    {
-        pointLight->ambientStr += 0.1f;
-        pointLight->specStr += 0.1f;
-    }
+    // // point light brightness
+    // if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
+    // {
+    //     pointLight->ambientStr += 0.1f;
+    //     pointLight->specStr += 0.1f;
+    // }
 
-    if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
-    {
-        pointLight->ambientStr -= 0.1f;
-        pointLight->specStr -= 0.1f;
-    }
+    // if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
+    // {
+    //     pointLight->ambientStr -= 0.1f;
+    //     pointLight->specStr -= 0.1f;
+    // }
 }
 
 static void Cursor_Position_Callback(GLFWwindow *window, double xpos, double ypos)
@@ -232,9 +233,6 @@ static void Cursor_Position_Callback(GLFWwindow *window, double xpos, double ypo
             // translate the camera 10 units away in all directions and negate its (direction) rotation to keep it aimed at the origin (0, 0, 0)
             frontCamera->rotation.x += 0.1f * float(width / 2 - xpos);
             frontCamera->rotation.y += 0.1f * float(height / 2 - ypos);
-            frontCamera->position.x = -(cos(glm::radians(frontCamera->rotation.y)) * sin(glm::radians(frontCamera->rotation.x))) * 10.f;
-            frontCamera->position.y = -sin(glm::radians(frontCamera->rotation.y)) * 10.f;
-            frontCamera->position.z = -(cos(glm::radians(frontCamera->rotation.y)) * cos(glm::radians(frontCamera->rotation.x))) * 10.f;
         }
     }
 }
@@ -375,13 +373,14 @@ int main(void)
 
     glEnableVertexAttribArray(0);
 
+    // skybox textures from https://www.pngwing.com/en/free-png-hzcii
     std::string facesSkybox[]{
-        "Models/Skybox/rainbow_rt.png",
-        "Models/Skybox/rainbow_lf.png",
-        "Models/Skybox/rainbow_up.png",
-        "Models/Skybox/rainbow_dn.png",
-        "Models/Skybox/rainbow_ft.png",
-        "Models/Skybox/rainbow_bk.png",
+        "Models/Skybox/Night/posx.jpg",
+        "Models/Skybox/Night/negx.jpg",
+        "Models/Skybox/Night/posy.jpg",
+        "Models/Skybox/Night/negy.jpg",
+        "Models/Skybox/Night/posz.jpg",
+        "Models/Skybox/Night/negz.jpg",
     };
 
     unsigned int skyboxTex;
@@ -413,17 +412,17 @@ int main(void)
     GLuint shaderProgram;
 
     // Voxel Link model from https://skfb.ly/6YJOU
-    mainModel = new Model3D("Models/source/VoxelLink.obj", "Models/texture/VoxelLink.png", vec3(1.f), vec3(0.f, -2.f, 0.f), vec3(0.f, 0.f, 0.f), vec3(0.2f));
+    mainModel = new Model3D("Models/source/VoxelLink.obj", "Models/texture/VoxelLink.png", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f), vec3(0.2f));
 
     // Among Us character model from https://skfb.ly/6XXwV
     lightModel = new Model3D("Models/source/among us.obj", "", vec3(1.f), vec3(0.f, 0.f, -10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f));
 
-    plane = new Model3D("Models/source/plane.obj", "Models/texture/MiscWeedsB_S.jpg", vec3(1.f), vec3(0.f, -5.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(100.f));
+    plane = new Model3D("Models/source/plane.obj", "Models/texture/Grass.png", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1000.f));
 
     frontCamera = new PerspectiveCamera(60, height, width, vec3(0.f, 2.f, 20.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f));
     topCamera = new OrthoCamera(vec3(0.f, 20.f, 0.f), vec3(0.f, -90.f, 0.f), vec3(0.f, 0.f, 0.f));
 
-    directionLight = new DirectionLight("dirLight", vec3(4, 11, -3), 1.f, 2.f, 32, vec3(0.f, 0.f, 1.f), vec3(0.7f, 0.7f, 1.f));
+    directionLight = new DirectionLight("dirLight", vec3(0, -10, 5), 0.1f, 0.2f, 32, vec3(0.3f, 0.3f, 1.f), vec3(0.3f, 0.3f, 1.f));
     pointLight = new PointLight("pointLight", lightModel->position + vec3(0.f, 2.f, 0.f), 0.5f, 0.7f, 32, vec3(1.f, 1.f, 1.f), vec3(1.f, 1.f, 1.f));
 
     std::cout << "loaded cameras" << std::endl;
@@ -459,7 +458,12 @@ int main(void)
     {
         // if using perspective cam, lock the mouse to the center to use the first person cam controls
         if (useFrontCamera)
+        {
             glfwSetCursorPos(window, height / 2.f, width / 2.f);
+            frontCamera->position.x = mainModel->position.x - (cos(glm::radians(frontCamera->rotation.y)) * sin(glm::radians(frontCamera->rotation.x))) * 10.f;
+            frontCamera->position.y = (mainModel->position.y + 3.f) - sin(glm::radians(frontCamera->rotation.y)) * 10.f;
+            frontCamera->position.z = mainModel->position.z - (cos(glm::radians(frontCamera->rotation.y)) * cos(glm::radians(frontCamera->rotation.x))) * 10.f;
+        }
 
         Camera* currentCamera; 
 
@@ -516,8 +520,6 @@ int main(void)
         mainModel->draw(shaderProgram);
         lightModel->draw(shaderProgram);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
         plane->draw(shaderProgram);
 
         /* Swap front and back buffers */
