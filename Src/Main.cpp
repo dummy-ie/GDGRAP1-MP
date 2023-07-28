@@ -26,6 +26,7 @@
 #include "Lighting/PointLight.hpp"
 
 #include "Models/Model3D.cpp"
+#include "Models/Player.cpp"
 
 using namespace glm;
 using namespace gd;
@@ -43,7 +44,7 @@ static PerspectiveCamera *frontCamera;
 static OrthoCamera *topCamera;
 
 // global pointers for both models
-static Model3D *mainModel;
+static Player *player;
 static Model3D *lightModel;
 static Model3D *plane;
 
@@ -94,17 +95,15 @@ static void Key_Callback(
         {
             pointLight->lightColor = vec3(1.0f, 0.72f, 0.77f);
             pointLight->ambientColor = vec3(1.0f, 0.72f, 0.77f);
-            // pointLight->lightColor = vec3(1.f);
-            // pointLight->ambientColor = vec3(1.f);
             lightModel->color = vec3(1.0f, 0.72f, 0.77f);
-            mainModel->color = vec3(1.f);
+            player->color = vec3(1.f);
         }
         else
         {
             pointLight->lightColor = vec3(1.f);
             pointLight->ambientColor = vec3(1.f);
             lightModel->color = vec3(1.f);
-            mainModel->color = vec3(1.f);
+            player->color = vec3(1.f);
         }
     }
 
@@ -119,7 +118,7 @@ static void Key_Callback(
         }
         else
         {
-            mainModel->rotation.y -= rotationIncrement;
+            player->rotation.y -= rotationIncrement;
         }
     }
 
@@ -133,7 +132,7 @@ static void Key_Callback(
         }
         else
         {
-            mainModel->rotation.y += rotationIncrement;
+            player->rotation.y += rotationIncrement;
         }
     }
 
@@ -148,7 +147,7 @@ static void Key_Callback(
         }
         else
         {
-            mainModel->position.z += positionIncrement;
+            player->directionalMove(true);
         }
     }
 
@@ -162,7 +161,7 @@ static void Key_Callback(
         }
         else
         {
-            mainModel->position.z -= positionIncrement;
+            player->directionalMove(false);
         }
     }
 
@@ -177,7 +176,7 @@ static void Key_Callback(
     //     }
     //     else
     //     {
-    //         mainModel->position.z -= positionIncrement;
+    //         player->position.z -= positionIncrement;
     //     }
     // }
 
@@ -191,7 +190,7 @@ static void Key_Callback(
     //     }
     //     else
     //     {
-    //         mainModel->position.z += positionIncrement;
+    //         player->position.z += positionIncrement;
     //     }
     // }
 
@@ -412,7 +411,7 @@ int main(void)
     GLuint shaderProgram;
 
     // Voxel Link model from https://skfb.ly/6YJOU
-    mainModel = new Model3D("Models/source/VoxelLink.obj", "Models/texture/VoxelLink.png", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f), vec3(0.2f));
+    player = new Player("Models/source/VoxelLink.obj", "Models/texture/VoxelLink.png", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f), vec3(0.2f));
 
     // Among Us character model from https://skfb.ly/6XXwV
     lightModel = new Model3D("Models/source/among us.obj", "", vec3(1.f), vec3(0.f, 0.f, -10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f));
@@ -460,9 +459,9 @@ int main(void)
         if (useFrontCamera)
         {
             glfwSetCursorPos(window, height / 2.f, width / 2.f);
-            frontCamera->position.x = mainModel->position.x - (cos(glm::radians(frontCamera->rotation.y)) * sin(glm::radians(frontCamera->rotation.x))) * 10.f;
-            frontCamera->position.y = (mainModel->position.y + 3.f) - sin(glm::radians(frontCamera->rotation.y)) * 10.f;
-            frontCamera->position.z = mainModel->position.z - (cos(glm::radians(frontCamera->rotation.y)) * cos(glm::radians(frontCamera->rotation.x))) * 10.f;
+            frontCamera->position.x = player->position.x - (cos(glm::radians(frontCamera->rotation.y)) * sin(glm::radians(frontCamera->rotation.x))) * 10.f;
+            frontCamera->position.y = (player->position.y + 3.f) - sin(glm::radians(frontCamera->rotation.y)) * 10.f;
+            frontCamera->position.z = player->position.z - (cos(glm::radians(frontCamera->rotation.y)) * cos(glm::radians(frontCamera->rotation.x))) * 10.f;
         }
 
         Camera* currentCamera; 
@@ -517,7 +516,7 @@ int main(void)
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(currentCamera->generateViewMatrix()));
 
         // Draw
-        mainModel->draw(shaderProgram);
+        player->draw(shaderProgram);
         lightModel->draw(shaderProgram);
 
         plane->draw(shaderProgram);

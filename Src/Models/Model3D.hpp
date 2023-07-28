@@ -1,5 +1,5 @@
-#ifndef MODEL_3D
-#define MODEL_3D
+#ifndef MODEL_3D_HPP
+#define MODEL_3D_HPP
 
 namespace model
 {
@@ -31,4 +31,4 @@ namespace model
     };
 } // namespace model
 
-#endif // !MODEL_3D
+#endif // !MODEL_3D_HPP

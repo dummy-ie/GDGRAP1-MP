@@ -88,6 +88,8 @@ void main(){
 	// if there's any changes to the colors, apply it
 	if (any(lessThan(rgba.xyz, vec3(1.f))))
 		FragColor *= rgba;
+
+	// FragColor *= vec4(0.f, 1.f, 0.f, 1.f); // simple nightvision
 }
 
 vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
