@@ -17,6 +17,8 @@
 #include <iostream>
 #include <string>
 
+#include "Shaders/Shader.hpp"
+
 #include "Camera/Camera.cpp"
 #include "Camera/OrthoCamera.hpp"
 #include "Camera/PerspectiveCamera.hpp"
@@ -30,6 +32,7 @@
 
 using namespace glm;
 using namespace gd;
+using namespace shader;
 
 // Screen dimensions
 static float height = 600.f;
@@ -285,34 +288,7 @@ int main(void)
     glfwSetCursorPosCallback(window, Cursor_Position_Callback);
     glfwSetMouseButtonCallback(window, Mouse_Button_Callback);
 
-    std::fstream sky_vertSrc("Shaders/skybox.vert");
-    std::stringstream sky_vertBuff;
-    sky_vertBuff << sky_vertSrc.rdbuf();
-    std::string sky_vertS = sky_vertBuff.str();
-    const char *sky_v = sky_vertS.c_str();
-
-    std::fstream sky_fragSrc("Shaders/skybox.frag");
-    std::stringstream sky_fragBuff;
-    sky_fragBuff << sky_fragSrc.rdbuf();
-    std::string sky_fragS = sky_fragBuff.str();
-    const char *sky_f = sky_fragS.c_str();
-
-    GLuint sky_vertShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(sky_vertShader, 1, &sky_v, NULL);
-    glCompileShader(sky_vertShader);
-
-    GLuint sky_fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(sky_fragShader, 1, &sky_f, NULL);
-    glCompileShader(sky_fragShader);
-
-    GLuint skyboxProgram = glCreateProgram();
-    glAttachShader(skyboxProgram, sky_vertShader);
-    glAttachShader(skyboxProgram, sky_fragShader);
-
-    glLinkProgram(skyboxProgram);
-
-    // glDeleteShader(sky_vertShader);
-    // glDeleteShader(sky_fragShader);
+    Shader skybox("Shaders/skybox.vert", "Shaders/skybox.frag"); 
 
     /*
   7--------6
@@ -406,8 +382,6 @@ int main(void)
         stbi_image_free(data);
     }
 
-    GLuint shaderProgram;
-
     // Voxel Link model from https://skfb.ly/6YJOU
     player = new Player("Models/source/tanknew.obj", "Models/texture/tank.jpg", vec3(1.f), vec3(0.f, 1.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1.f));
 
@@ -425,36 +399,11 @@ int main(void)
 
     std::cout << "loaded cameras" << std::endl;
 
-    std::fstream vertSrc("Shaders/sample.vert");
-    std::stringstream vertBuff;
-    vertBuff << vertSrc.rdbuf();
-    std::string vertS = vertBuff.str();
-    const char *v = vertS.c_str();
-
-    std::fstream fragSrc("Shaders/sample.frag");
-    std::stringstream fragBuff;
-    fragBuff << fragSrc.rdbuf();
-    std::string fragS = fragBuff.str();
-    const char *f = fragS.c_str();
-
-    GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertShader, 1, &v, NULL);
-    glCompileShader(vertShader);
-
-    GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragShader, 1, &f, NULL);
-    glCompileShader(fragShader);
-
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertShader);
-    glAttachShader(shaderProgram, fragShader);
-
-    glLinkProgram(shaderProgram);
+    Shader sample("Shaders/sample.vert", "Shaders/sample.frag");
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        // int useThirdPersonCameraFragPass = (int)useThirdPersonCamera;
         // if using perspective cam, lock the mouse to the center to use the first person cam controls
         if (usePerspectiveCamera)
         {
@@ -474,8 +423,6 @@ int main(void)
             }
         }
 
-        // position.x +=  * speed;
-        // position.z += cos(glm::radians(rotation.y))
         firstPersonCamera->rotation.x = player->rotation.z;
         firstPersonCamera->position.x = player->position.x + sin(glm::radians(player->rotation.z)) * 5.f;
         firstPersonCamera->position.z = player->position.z + cos(glm::radians(player->rotation.z)) * 5.f;
@@ -503,19 +450,19 @@ int main(void)
         glDepthMask(GL_FALSE);
         glDepthFunc(GL_LEQUAL);
 
-        glUseProgram(skyboxProgram);
+        glUseProgram(skybox.shaderProgram);
 
         glm::mat4 skyView = glm::mat4(1.f);
         skyView = glm::mat4(
             glm::mat3(currentCamera->generateViewMatrix()));
 
-        unsigned int sky_ViewLoc = glGetUniformLocation(skyboxProgram, "view");
+        unsigned int sky_ViewLoc = glGetUniformLocation(skybox.shaderProgram, "view");
         glUniformMatrix4fv(sky_ViewLoc, 1, GL_FALSE, glm::value_ptr(skyView));
 
-        unsigned int sky_ProjectionLoc = glGetUniformLocation(skyboxProgram, "projection");
+        unsigned int sky_ProjectionLoc = glGetUniformLocation(skybox.shaderProgram, "projection");
         glUniformMatrix4fv(sky_ProjectionLoc, 1, GL_FALSE, glm::value_ptr(currentCamera->generateProjectionMatrix()));
 
-        unsigned int sky_useThirdPersonCameraLoc = glGetUniformLocation(skyboxProgram, "useThirdPersonCamera");
+        unsigned int sky_useThirdPersonCameraLoc = glGetUniformLocation(skybox.shaderProgram, "useThirdPersonCamera");
         glUniform1i(sky_useThirdPersonCameraLoc, useThirdPersonCamera);
 
         glBindVertexArray(skyboxVAO);
@@ -527,32 +474,32 @@ int main(void)
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LESS);
 
-        glUseProgram(shaderProgram);
+        glUseProgram(sample.shaderProgram);
 
-        unsigned int cameraPosLoc = glGetUniformLocation(shaderProgram, "cameraPos");
+        unsigned int cameraPosLoc = glGetUniformLocation(sample.shaderProgram, "cameraPos");
         glUniform3fv(cameraPosLoc, 1, glm::value_ptr(currentCamera->position));
 
         // update uniforms for both lights
-        directionLight->applyUniforms(shaderProgram);
-        directionLight->applyExtraUniforms(shaderProgram);
+        directionLight->applyUniforms(sample.shaderProgram);
+        directionLight->applyExtraUniforms(sample.shaderProgram);
 
-        pointLight->applyUniforms(shaderProgram);
-        pointLight->applyExtraUniforms(shaderProgram);
+        pointLight->applyUniforms(sample.shaderProgram);
+        pointLight->applyExtraUniforms(sample.shaderProgram);
 
-        unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
+        unsigned int projectionLoc = glGetUniformLocation(sample.shaderProgram, "projection");
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(currentCamera->generateProjectionMatrix()));
 
-        unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
+        unsigned int viewLoc = glGetUniformLocation(sample.shaderProgram, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(currentCamera->generateViewMatrix()));
 
-        unsigned int useThirdPersonCameraLoc = glGetUniformLocation(shaderProgram, "useThirdPersonCamera");
+        unsigned int useThirdPersonCameraLoc = glGetUniformLocation(sample.shaderProgram, "useThirdPersonCamera");
         glUniform1i(useThirdPersonCameraLoc, useThirdPersonCamera);
 
         // Draw
-        player->draw(shaderProgram);
-        lightModel->draw(shaderProgram);
+        player->draw(sample.shaderProgram);
+        lightModel->draw(sample.shaderProgram);
 
-        plane->draw(shaderProgram);
+        plane->draw(sample.shaderProgram);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
