@@ -64,10 +64,14 @@ static bool controlLight = false;
 // (where the main model is) and then setting the point light's position to it as well
 void updateLightPosition()
 {
-    lightModel->rotation = glm::radians(lightModel->rotation);
-    lightModel->position = toMat4(quat(lightModel->rotation)) * vec4(lightModel->position, 1.f);
+    //lightModel->rotation = glm::radians(lightModel->rotation);
+    //lightModel->position = toMat4(quat(lightModel->rotation)) * vec4(lightModel->position, 1.f);
 
-    pointLight->position = lightModel->position;
+    glm::vec3 position = player->position;
+    position.x += sin(glm::radians(player->rotation.y)) * 10.f;
+    position.z += cos(glm::radians(player->rotation.y)) * 10.f;
+
+    pointLight->position = position;
 }
 
 static void Key_Callback(
@@ -118,7 +122,7 @@ static void Key_Callback(
         {
             lightModel->rotation.y -= rotationIncrement;
 
-            updateLightPosition();
+            //updateLightPosition();
         }
         else if (usePerspectiveCamera)
         {
@@ -132,7 +136,7 @@ static void Key_Callback(
         {
             lightModel->rotation.y += rotationIncrement;
 
-            updateLightPosition();
+            //updateLightPosition();
         }
         else if (usePerspectiveCamera)
         {
@@ -147,11 +151,12 @@ static void Key_Callback(
         {
             lightModel->rotation.x -= rotationIncrement;
 
-            updateLightPosition();
+            //updateLightPosition();
         }
         else if (usePerspectiveCamera && useThirdPersonCamera)
         {
             player->directionalMove(true);
+            updateLightPosition();
         }
         else if (usePerspectiveCamera && !useThirdPersonCamera && firstPersonCamera->rotation.y <= 90.f)
         {
@@ -165,11 +170,12 @@ static void Key_Callback(
         {
             lightModel->rotation.x += rotationIncrement;
 
-            updateLightPosition();
+            //updateLightPosition();
         }
         else if (usePerspectiveCamera && useThirdPersonCamera)
         {
             player->directionalMove(false);
+            updateLightPosition();
         }
         else if (usePerspectiveCamera && !useThirdPersonCamera && firstPersonCamera->rotation.y >= -90.f)
         {
