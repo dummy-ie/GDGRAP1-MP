@@ -462,7 +462,13 @@ int main(void)
             frontCamera->position.x = player->position.x - (cos(glm::radians(frontCamera->rotation.y)) * sin(glm::radians(frontCamera->rotation.x))) * 10.f;
             frontCamera->position.y = (player->position.y + 3.f) - sin(glm::radians(frontCamera->rotation.y)) * 10.f;
             frontCamera->position.z = player->position.z - (cos(glm::radians(frontCamera->rotation.y)) * cos(glm::radians(frontCamera->rotation.x))) * 10.f;
+
+            if (frontCamera->position.y <= 0.1f)
+                frontCamera->position.y = 0.1f;
         }
+
+        topCamera->position.x = player->position.x;
+        topCamera->position.z = player->position.z;
 
         Camera* currentCamera; 
 
