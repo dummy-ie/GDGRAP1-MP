@@ -5,9 +5,12 @@ out vec4 FragColor;
 in vec3 texCoord;
 
 uniform samplerCube skybox;
+uniform bool useThirdPersonCamera;
 
 void main(){
 
     FragColor = texture(skybox, texCoord);
-    // FragColor *= vec4(0.f, 1.f, 0.f, 1.f); // simple nightvision
+
+    if (!useThirdPersonCamera) // cheap ww
+        FragColor *= vec4(0.f, 1.f, 0.f, 1.f); // simple nightvision
 }

@@ -39,8 +39,9 @@ static float width = 600.f;
 static float positionIncrement = 1.f;
 static float rotationIncrement = 5.f;
 
-// global pointers for both cameras
-static PerspectiveCamera *frontCamera;
+// global pointers for all cameras
+static PerspectiveCamera *thirdPersonCamera;
+static PerspectiveCamera *firstPersonCamera;
 static OrthoCamera *topCamera;
 
 // global pointers for both models
@@ -53,7 +54,8 @@ static PointLight *pointLight;
 static DirectionLight *directionLight;
 
 // if we're using the perspective or ortho camera
-static bool useFrontCamera = true;
+static bool usePerspectiveCamera = true;
+static bool useThirdPersonCamera = true;
 
 // if we're controlling the center model or the light model
 static bool controlLight = false;
@@ -78,13 +80,15 @@ static void Key_Callback(
     // perspective cam
     if (key == GLFW_KEY_1 && (action == GLFW_REPEAT || action == GLFW_PRESS))
     {
-        useFrontCamera = true;
+        usePerspectiveCamera = true;
+        useThirdPersonCamera = !useThirdPersonCamera;
     }
 
     // ortho cam
     if (key == GLFW_KEY_2 && (action == GLFW_REPEAT || action == GLFW_PRESS))
     {
-        useFrontCamera = false;
+        usePerspectiveCamera = !usePerspectiveCamera;
+        useThirdPersonCamera = true;
     }
 
     // switch model
@@ -116,7 +120,7 @@ static void Key_Callback(
 
             updateLightPosition();
         }
-        else
+        else if (usePerspectiveCamera)
         {
             player->rotation.y -= rotationIncrement;
         }
@@ -130,7 +134,7 @@ static void Key_Callback(
 
             updateLightPosition();
         }
-        else
+        else if (usePerspectiveCamera)
         {
             player->rotation.y += rotationIncrement;
         }
@@ -145,9 +149,13 @@ static void Key_Callback(
 
             updateLightPosition();
         }
-        else
+        else if (usePerspectiveCamera && useThirdPersonCamera)
         {
             player->directionalMove(true);
+        }
+        else if (usePerspectiveCamera && !useThirdPersonCamera && firstPersonCamera->rotation.y <= 90.f)
+        {
+            firstPersonCamera->rotation.y += rotationIncrement;
         }
     }
 
@@ -159,40 +167,27 @@ static void Key_Callback(
 
             updateLightPosition();
         }
-        else
+        else if (usePerspectiveCamera && useThirdPersonCamera)
         {
             player->directionalMove(false);
         }
+        else if (usePerspectiveCamera && !useThirdPersonCamera && firstPersonCamera->rotation.y >= -90.f)
+        {
+            firstPersonCamera->rotation.y -= rotationIncrement;
+        }
     }
 
-    // z axis rotation
-    // if (key == GLFW_KEY_E && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    // {
-    //     if (controlLight)
-    //     {
-    //         lightModel->rotation.z -= rotationIncrement;
+    if (key == GLFW_KEY_E && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+        if (usePerspectiveCamera && !useThirdPersonCamera && firstPersonCamera->fov <= 120.f)
+            firstPersonCamera->fov += 5.f;
+    }
 
-    //         updateLightPosition();
-    //     }
-    //     else
-    //     {
-    //         player->position.z -= positionIncrement;
-    //     }
-    // }
-
-    // if (key == GLFW_KEY_Q && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    // {
-    //     if (controlLight)
-    //     {
-    //         lightModel->rotation.z += rotationIncrement;
-
-    //         updateLightPosition();
-    //     }
-    //     else
-    //     {
-    //         player->position.z += positionIncrement;
-    //     }
-    // }
+    if (key == GLFW_KEY_Q && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+        if (usePerspectiveCamera && !useThirdPersonCamera && firstPersonCamera->fov >= 10.f)
+            firstPersonCamera->fov -= 5.f;
+    }
 
     // direction light brightness
     // if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
@@ -207,31 +202,29 @@ static void Key_Callback(
     //     directionLight->specStr -= 0.1f;
     // }
 
-    // // point light brightness
-    // if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
-    // {
-    //     pointLight->ambientStr += 0.1f;
-    //     pointLight->specStr += 0.1f;
-    // }
+    // first person camera zoom
+    if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+        
+    }
 
-    // if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS) && controlLight)
-    // {
-    //     pointLight->ambientStr -= 0.1f;
-    //     pointLight->specStr -= 0.1f;
-    // }
+    if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+        
+    }
 }
 
 static void Cursor_Position_Callback(GLFWwindow *window, double xpos, double ypos)
 {
     if (glfwGetWindowAttrib(window, GLFW_FOCUSED))
     {
-        if (useFrontCamera)
+        if (usePerspectiveCamera)
         {
             // some dark magic ritual that works!
             // rotate the camera using the mouse's offset from the center while we keep the mouse at the center of the screen.
             // translate the camera 10 units away in all directions and negate its (direction) rotation to keep it aimed at the origin (0, 0, 0)
-            frontCamera->rotation.x += 0.1f * float(width / 2 - xpos);
-            frontCamera->rotation.y += 0.1f * float(height / 2 - ypos);
+            thirdPersonCamera->rotation.x += 0.1f * float(width / 2 - xpos);
+            thirdPersonCamera->rotation.y += 0.1f * float(height / 2 - ypos);
         }
     }
 }
@@ -418,7 +411,8 @@ int main(void)
 
     plane = new Model3D("Models/source/plane.obj", "Models/texture/Grass.png", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1000.f));
 
-    frontCamera = new PerspectiveCamera(60, height, width, vec3(0.f, 2.f, 20.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f));
+    thirdPersonCamera = new PerspectiveCamera(60, height, width, vec3(0.f, 2.f, 20.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f));
+    firstPersonCamera = new PerspectiveCamera(60, height, width, vec3(0.f, 2.f, 20.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f));
     topCamera = new OrthoCamera(vec3(0.f, 20.f, 0.f), vec3(0.f, -90.f, 0.f), vec3(0.f, 0.f, 0.f));
 
     directionLight = new DirectionLight("dirLight", vec3(0, -10, 5), 0.1f, 0.2f, 32, vec3(0.3f, 0.3f, 1.f), vec3(0.3f, 0.3f, 1.f));
@@ -455,25 +449,41 @@ int main(void)
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+        // int useThirdPersonCameraFragPass = (int)useThirdPersonCamera;
         // if using perspective cam, lock the mouse to the center to use the first person cam controls
-        if (useFrontCamera)
+        if (usePerspectiveCamera)
         {
-            glfwSetCursorPos(window, height / 2.f, width / 2.f);
-            frontCamera->position.x = player->position.x - (cos(glm::radians(frontCamera->rotation.y)) * sin(glm::radians(frontCamera->rotation.x))) * 10.f;
-            frontCamera->position.y = (player->position.y + 3.f) - sin(glm::radians(frontCamera->rotation.y)) * 10.f;
-            frontCamera->position.z = player->position.z - (cos(glm::radians(frontCamera->rotation.y)) * cos(glm::radians(frontCamera->rotation.x))) * 10.f;
+            if (useThirdPersonCamera)
+            {
+                glfwSetCursorPos(window, height / 2.f, width / 2.f);
+                thirdPersonCamera->position.x = player->position.x - (cos(glm::radians(thirdPersonCamera->rotation.y)) * sin(glm::radians(thirdPersonCamera->rotation.x))) * 10.f;
+                thirdPersonCamera->position.y = (player->position.y + 3.f) - sin(glm::radians(thirdPersonCamera->rotation.y)) * 10.f;
+                thirdPersonCamera->position.z = player->position.z - (cos(glm::radians(thirdPersonCamera->rotation.y)) * cos(glm::radians(thirdPersonCamera->rotation.x))) * 10.f;
 
-            if (frontCamera->position.y <= 0.1f)
-                frontCamera->position.y = 0.1f;
+                if (thirdPersonCamera->position.y <= 0.1f)
+                    thirdPersonCamera->position.y = 0.1f;
+            }
+            else
+            {
+                
+            }
         }
+
+        // position.x +=  * speed;
+        // position.z += cos(glm::radians(rotation.y))
+        firstPersonCamera->rotation.x = player->rotation.y;
+        firstPersonCamera->position.x = player->position.x + sin(glm::radians(player->rotation.y)) * 5.f;
+        firstPersonCamera->position.z = player->position.z + cos(glm::radians(player->rotation.y)) * 5.f;
 
         topCamera->position.x = player->position.x;
         topCamera->position.z = player->position.z;
 
         Camera* currentCamera; 
 
-        if (useFrontCamera) // use perspective projection and view matrix
-            currentCamera = frontCamera;
+        if (usePerspectiveCamera && useThirdPersonCamera) // use perspective projection and view matrix
+            currentCamera = thirdPersonCamera;
+        else if (usePerspectiveCamera && !useThirdPersonCamera) 
+            currentCamera = firstPersonCamera;
         else // use orthographic projection and view matrix
             currentCamera = topCamera;
 
@@ -496,6 +506,9 @@ int main(void)
 
         unsigned int sky_ProjectionLoc = glGetUniformLocation(skyboxProgram, "projection");
         glUniformMatrix4fv(sky_ProjectionLoc, 1, GL_FALSE, glm::value_ptr(currentCamera->generateProjectionMatrix()));
+
+        unsigned int sky_useThirdPersonCameraLoc = glGetUniformLocation(skyboxProgram, "useThirdPersonCamera");
+        glUniform1i(sky_useThirdPersonCameraLoc, useThirdPersonCamera);
 
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
@@ -523,6 +536,9 @@ int main(void)
 
         unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(currentCamera->generateViewMatrix()));
+
+        unsigned int useThirdPersonCameraLoc = glGetUniformLocation(shaderProgram, "useThirdPersonCamera");
+        glUniform1i(useThirdPersonCameraLoc, useThirdPersonCamera);
 
         // Draw
         player->draw(shaderProgram);

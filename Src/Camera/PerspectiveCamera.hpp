@@ -8,8 +8,10 @@ namespace gd
     using namespace glm;
     class PerspectiveCamera : public Camera
     {
-    private:
+    public:
         float fov;
+        
+    private:
         float height;
         float width;
 

@@ -5,6 +5,8 @@ uniform sampler2D tex0;
 uniform vec3 cameraPos;
 uniform vec4 rgba = vec4(1.f);
 
+uniform bool useThirdPersonCamera;
+
 out vec4 FragColor;
 
 in vec3 normCoord;
@@ -110,8 +112,11 @@ void main(){
 	if (any(lessThan(rgba.xyz, vec3(1.f))))
 		FragColor *= rgba;
 
-	FragColor = mix(vec4(0.02f, 0.02f, 0.05f, 1.f), FragColor, 1.f - fog_factor);
-	// FragColor *= vec4(0.f, 1.f, 0.f, 1.f); // simple nightvision
+
+	if (!useThirdPersonCamera)
+		FragColor *= vec4(0.f, 1.f, 0.f, 1.f); // simple nightvision
+	else
+		FragColor = mix(vec4(0.02f, 0.02f, 0.05f, 1.f), FragColor, 1.f - fog_factor);
 }
 
 vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
