@@ -68,8 +68,7 @@ void updateLightPosition()
     //lightModel->position = toMat4(quat(lightModel->rotation)) * vec4(lightModel->position, 1.f);
 
     glm::vec3 position = player->position;
-    position.x += sin(glm::radians(player->rotation.y)) * 10.f;
-    position.z += cos(glm::radians(player->rotation.y)) * 10.f;
+    
 
     pointLight->position = position;
 }
@@ -480,6 +479,9 @@ int main(void)
         firstPersonCamera->rotation.x = player->rotation.z;
         firstPersonCamera->position.x = player->position.x + sin(glm::radians(player->rotation.z)) * 5.f;
         firstPersonCamera->position.z = player->position.z + cos(glm::radians(player->rotation.z)) * 5.f;
+
+        pointLight->position.x = player->position.x - sin(glm::radians(player->rotation.z)) * 5.f;
+        pointLight->position.z = player->position.z - cos(glm::radians(player->rotation.z)) * 5.f;
 
         topCamera->position.x = player->position.x;
         topCamera->position.z = player->position.z;
