@@ -11,12 +11,12 @@ void Player::directionalMove(bool isForward)
 {
     if (isForward)
     {
-        position.x += sin(glm::radians(rotation.y)) * speed;
-        position.z += cos(glm::radians(rotation.y)) * speed;
+        position.x -= sin(glm::radians(rotation.z)) * speed;
+        position.z -= cos(glm::radians(rotation.z)) * speed;
     }
     else
     {
-        position.x -= sin(glm::radians(rotation.y)) * speed;
-        position.z -= cos(glm::radians(rotation.y)) * speed;
+        position.x += sin(glm::radians(rotation.z)) * speed;
+        position.z += cos(glm::radians(rotation.z)) * speed;
     }
 }

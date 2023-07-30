@@ -122,7 +122,7 @@ static void Key_Callback(
         }
         else if (usePerspectiveCamera)
         {
-            player->rotation.y -= rotationIncrement;
+            player->rotation.z -= rotationIncrement;
         }
     }
 
@@ -136,7 +136,7 @@ static void Key_Callback(
         }
         else if (usePerspectiveCamera)
         {
-            player->rotation.y += rotationIncrement;
+            player->rotation.z += rotationIncrement;
         }
     }
 
@@ -404,7 +404,7 @@ int main(void)
     GLuint shaderProgram;
 
     // Voxel Link model from https://skfb.ly/6YJOU
-    player = new Player("Models/source/VoxelLink.obj", "Models/texture/VoxelLink.png", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f), vec3(0.2f));
+    player = new Player("Models/source/tanknew.obj", "Models/texture/tank.jpg", vec3(1.f), vec3(0.f, 1.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1.f));
 
     // Among Us character model from https://skfb.ly/6XXwV
     lightModel = new Model3D("Models/source/among us.obj", "", vec3(1.f), vec3(0.f, 0.f, -10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f));
@@ -471,9 +471,9 @@ int main(void)
 
         // position.x +=  * speed;
         // position.z += cos(glm::radians(rotation.y))
-        firstPersonCamera->rotation.x = player->rotation.y;
-        firstPersonCamera->position.x = player->position.x + sin(glm::radians(player->rotation.y)) * 5.f;
-        firstPersonCamera->position.z = player->position.z + cos(glm::radians(player->rotation.y)) * 5.f;
+        firstPersonCamera->rotation.x = player->rotation.z;
+        firstPersonCamera->position.x = player->position.x + sin(glm::radians(player->rotation.z)) * 5.f;
+        firstPersonCamera->position.z = player->position.z + cos(glm::radians(player->rotation.z)) * 5.f;
 
         topCamera->position.x = player->position.x;
         topCamera->position.z = player->position.z;
