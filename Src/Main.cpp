@@ -47,9 +47,9 @@ static PerspectiveCamera *thirdPersonCamera;
 static PerspectiveCamera *firstPersonCamera;
 static OrthoCamera *topCamera;
 
-// global pointers for both models
+// in a perfect world i would have created a model manager
 static Player *player;
-static Model3D *lightModel;
+// static Model3D *lightModel;
 static Model3D *plane;
 
 // global pointers for both lights
@@ -96,26 +96,6 @@ static void Key_Callback(
         useThirdPersonCamera = true;
         topCamera->position.x = player->position.x;
         topCamera->position.z = player->position.z;
-    }
-
-    // switch model
-    if (key == GLFW_KEY_SPACE && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    {
-        controlLight = !controlLight;
-        if (controlLight)
-        {
-            pointLight->lightColor = vec3(1.0f, 0.72f, 0.77f);
-            pointLight->ambientColor = vec3(1.0f, 0.72f, 0.77f);
-            lightModel->color = vec3(1.0f, 0.72f, 0.77f);
-            player->color = vec3(1.f);
-        }
-        else
-        {
-            pointLight->lightColor = vec3(1.f);
-            pointLight->ambientColor = vec3(1.f);
-            lightModel->color = vec3(1.f);
-            player->color = vec3(1.f);
-        }
     }
 
     // y axis rotation
@@ -200,6 +180,17 @@ static void Key_Callback(
     {
         if (usePerspectiveCamera && !useThirdPersonCamera && firstPersonCamera->fov >= 10.f)
             firstPersonCamera->fov -= 5.f;
+    }
+
+    if (key == GLFW_KEY_F && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    {
+        if (pointLight->specStr >= 2.f)
+        {
+            pointLight->ambientStr = 0.7f;
+            pointLight->specStr = 0.5f;
+        }
+        pointLight->ambientStr += 0.7f;
+        pointLight->specStr += 0.5f;
     }
 
     // direction light brightness
@@ -388,7 +379,24 @@ int main(void)
     player = new Player("Models/source/tanknew.obj", "Models/texture/tank.jpg", "Models/texture/tank_normal.jpg", vec3(1.f), vec3(0.f, 0.7f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1.f));
 
     // Among Us character model from https://skfb.ly/6XXwV
-    lightModel = new Model3D("Models/source/among us.obj", "", "", vec3(1.f), vec3(0.f, 0.f, -10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f));
+    Model3D amogus("Models/source/among us.obj", "Plastic_4K_Diffuse.jpg", "Plastic_4K_Normal.jpg", vec3(1.f), vec3(0.f, 0.f, -30.f), vec3(0.f, 0.f, 0.f), vec3(0.01f));
+    
+    // Model3D fictionalTank("Models/source/fictionaltank.obj", "Models/texture/fictionaltank.png");
+    // fictionalTank.position = vec3(10.f, 0.f, 0.f);
+    
+    Model3D genericTank("Models/source/generictank.obj", "Models/texture/generictank.jpg");
+    genericTank.position = vec3(10.f, 0.f, 10.f);
+    
+    Model3D ozelot("Models/source/ozelot.obj", "Models/texture/ozelot.jpg");
+    ozelot.position = vec3(0.f, 0.f, 10.f);
+    
+    Model3D sherman("Models/source/sherman.obj", "Models/texture/sherman.jpg");
+    sherman.position = vec3(-10.f, 0.f, 10.f);
+    
+    Model3D t90broken("Models/source/t90broken.obj", "Models/texture/t90broken.png");
+    t90broken.position = vec3(-10.f, 0.f, 0.f);
+    
+    // Model3D fictionalTank("Models/source/fictionaltank.obj", "Models/texture/fictionaltank.png");
 
     plane = new Model3D("Models/source/plane.obj", "Models/texture/Grass.png", "", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1000.f));
 
@@ -498,7 +506,12 @@ int main(void)
 
         // Draw
         player->draw(sample.shaderProgram);
-        lightModel->draw(sample.shaderProgram);
+        amogus.draw(sample.shaderProgram);
+        // fictionalTank.draw(sample.shaderProgram);
+        genericTank.draw(sample.shaderProgram);
+        ozelot.draw(sample.shaderProgram);
+        sherman.draw(sample.shaderProgram);
+        t90broken.draw(sample.shaderProgram);
 
         plane->draw(sample.shaderProgram);
 
