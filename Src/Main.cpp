@@ -383,6 +383,9 @@ int main(void)
     
     // Model3D fictionalTank("Models/source/fictionaltank.obj", "Models/texture/fictionaltank.png");
     // fictionalTank.position = vec3(10.f, 0.f, 0.f);
+
+    // Model3D deadTree("Models/source/DeadTree_LoPoly.obj", "Models/texture/DeadTree_LoPoly_DeadTree_Diffuse.png");
+    // deadTree.position = vec3(10.f, 0.f, 0.f);
     
     Model3D genericTank("Models/source/generictank.obj", "Models/texture/generictank.jpg");
     genericTank.position = vec3(10.f, 0.f, 10.f);
@@ -432,9 +435,9 @@ int main(void)
             }
         }
 
-        firstPersonCamera->rotation.x = player->rotation.z;
-        firstPersonCamera->position.x = player->position.x + sin(glm::radians(player->rotation.z)) * 5.f;
-        firstPersonCamera->position.z = player->position.z + cos(glm::radians(player->rotation.z)) * 5.f;
+        firstPersonCamera->rotation.x = player->rotation.z + 180.f;
+        firstPersonCamera->position.x = player->position.x - sin(glm::radians(player->rotation.z)) * 5.f;
+        firstPersonCamera->position.z = player->position.z - cos(glm::radians(player->rotation.z)) * 5.f;
 
         pointLight->position.x = player->position.x - sin(glm::radians(player->rotation.z)) * 5.f;
         pointLight->position.z = player->position.z - cos(glm::radians(player->rotation.z)) * 5.f;
