@@ -67,11 +67,10 @@ static bool controlLight = false;
 // (where the main model is) and then setting the point light's position to it as well
 void updateLightPosition()
 {
-    //lightModel->rotation = glm::radians(lightModel->rotation);
-    //lightModel->position = toMat4(quat(lightModel->rotation)) * vec4(lightModel->position, 1.f);
+    // lightModel->rotation = glm::radians(lightModel->rotation);
+    // lightModel->position = toMat4(quat(lightModel->rotation)) * vec4(lightModel->position, 1.f);
 
     glm::vec3 position = player->position;
-    
 
     pointLight->position = position;
 }
@@ -95,6 +94,8 @@ static void Key_Callback(
     {
         usePerspectiveCamera = !usePerspectiveCamera;
         useThirdPersonCamera = true;
+        topCamera->position.x = player->position.x;
+        topCamera->position.z = player->position.z;
     }
 
     // switch model
@@ -120,11 +121,12 @@ static void Key_Callback(
     // y axis rotation
     if (key == GLFW_KEY_D && (action == GLFW_REPEAT || action == GLFW_PRESS))
     {
-        if (controlLight)
+        if (!usePerspectiveCamera)
         {
-            lightModel->rotation.y -= rotationIncrement;
-
-            //updateLightPosition();
+            // lightModel->rotation.y -= rotationIncrement;
+            topCamera->position.x -= positionIncrement;
+            // topCamera->position.z = player->position.z;
+            // updateLightPosition();
         }
         else if (usePerspectiveCamera)
         {
@@ -134,11 +136,12 @@ static void Key_Callback(
 
     if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
     {
-        if (controlLight)
+        if (!usePerspectiveCamera)
         {
-            lightModel->rotation.y += rotationIncrement;
+            topCamera->position.x += positionIncrement;
+            // topCamera->position.z = player->position.z;
 
-            //updateLightPosition();
+            // updateLightPosition();
         }
         else if (usePerspectiveCamera)
         {
@@ -149,11 +152,12 @@ static void Key_Callback(
     // x axis rotation
     if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS))
     {
-        if (controlLight)
+        if (!usePerspectiveCamera)
         {
-            lightModel->rotation.x -= rotationIncrement;
+            // topCamera->position.x = player->position.x;
+            topCamera->position.z -= positionIncrement;
 
-            //updateLightPosition();
+            // updateLightPosition();
         }
         else if (usePerspectiveCamera && useThirdPersonCamera)
         {
@@ -168,11 +172,12 @@ static void Key_Callback(
 
     if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS))
     {
-        if (controlLight)
+        if (!usePerspectiveCamera)
         {
-            lightModel->rotation.x += rotationIncrement;
+            // topCamera->position.x = player->position.x;
+            topCamera->position.z += positionIncrement;
 
-            //updateLightPosition();
+            // updateLightPosition();
         }
         else if (usePerspectiveCamera && useThirdPersonCamera)
         {
@@ -210,16 +215,13 @@ static void Key_Callback(
     //     directionLight->specStr -= 0.1f;
     // }
 
-    // first person camera zoom
-    if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    {
-        
-    }
+    // if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    // {
+    // }
 
-    if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS))
-    {
-        
-    }
+    // if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS))
+    // {
+    // }
 }
 
 static void Cursor_Position_Callback(GLFWwindow *window, double xpos, double ypos)
@@ -267,7 +269,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(height, width, "Marcus Leocario", NULL, NULL);
+    window = glfwCreateWindow(height, width, "Marcus Leocario / Joachim Arguelles", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -288,7 +290,7 @@ int main(void)
     glfwSetCursorPosCallback(window, Cursor_Position_Callback);
     glfwSetMouseButtonCallback(window, Mouse_Button_Callback);
 
-    Shader skybox("Shaders/skybox.vert", "Shaders/skybox.frag"); 
+    Shader skybox("Shaders/skybox.vert", "Shaders/skybox.frag");
 
     /*
   7--------6
@@ -383,19 +385,19 @@ int main(void)
     }
 
     // Voxel Link model from https://skfb.ly/6YJOU
-    player = new Player("Models/source/tanknew.obj", "Models/texture/tank.jpg", vec3(1.f), vec3(0.f, 1.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1.f));
+    player = new Player("Models/source/tanknew.obj", "Models/texture/tank.jpg", "Models/texture/tank_normal.jpg", vec3(1.f), vec3(0.f, 0.7f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1.f));
 
     // Among Us character model from https://skfb.ly/6XXwV
-    lightModel = new Model3D("Models/source/among us.obj", "", vec3(1.f), vec3(0.f, 0.f, -10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f));
+    lightModel = new Model3D("Models/source/among us.obj", "", "", vec3(1.f), vec3(0.f, 0.f, -10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f));
 
-    plane = new Model3D("Models/source/plane.obj", "Models/texture/Grass.png", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1000.f));
+    plane = new Model3D("Models/source/plane.obj", "Models/texture/Grass.png", "", vec3(1.f), vec3(0.f, 0.f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1000.f));
 
     thirdPersonCamera = new PerspectiveCamera(60, height, width, vec3(0.f, 2.f, 20.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f));
     firstPersonCamera = new PerspectiveCamera(60, height, width, vec3(0.f, 2.f, 20.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, 0.f));
-    topCamera = new OrthoCamera(vec3(0.f, 20.f, 0.f), vec3(0.f, -90.f, 0.f), vec3(0.f, 0.f, 0.f));
+    topCamera = new OrthoCamera(vec3(0.f, 50.f, 0.f), vec3(0.f, -90.f, 0.f), vec3(0.f, 0.f, 0.f));
 
     directionLight = new DirectionLight("dirLight", vec3(0, -10, 5), 0.1f, 0.2f, 32, vec3(0.3f, 0.3f, 1.f), vec3(0.3f, 0.3f, 1.f));
-    pointLight = new PointLight("pointLight", lightModel->position + vec3(0.f, 2.f, 0.f), 0.5f, 0.7f, 32, vec3(1.f, 1.f, 1.f), vec3(1.f, 1.f, 1.f));
+    pointLight = new PointLight("pointLight", vec3(0.f, 3.f, 0.f), 0.5f, 0.7f, 32, vec3(1.f, 1.f, 1.f), vec3(1.f, 1.f, 1.f));
 
     std::cout << "loaded cameras" << std::endl;
 
@@ -419,7 +421,6 @@ int main(void)
             }
             else
             {
-                
             }
         }
 
@@ -430,14 +431,11 @@ int main(void)
         pointLight->position.x = player->position.x - sin(glm::radians(player->rotation.z)) * 5.f;
         pointLight->position.z = player->position.z - cos(glm::radians(player->rotation.z)) * 5.f;
 
-        topCamera->position.x = player->position.x;
-        topCamera->position.z = player->position.z;
-
-        Camera* currentCamera; 
+        Camera *currentCamera;
 
         if (usePerspectiveCamera && useThirdPersonCamera) // use perspective projection and view matrix
             currentCamera = thirdPersonCamera;
-        else if (usePerspectiveCamera && !useThirdPersonCamera) 
+        else if (usePerspectiveCamera && !useThirdPersonCamera)
             currentCamera = firstPersonCamera;
         else // use orthographic projection and view matrix
             currentCamera = topCamera;
@@ -491,6 +489,9 @@ int main(void)
 
         unsigned int viewLoc = glGetUniformLocation(sample.shaderProgram, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(currentCamera->generateViewMatrix()));
+
+        unsigned int usePerspectiveCameraLoc = glGetUniformLocation(sample.shaderProgram, "usePerspectiveCamera");
+        glUniform1i(usePerspectiveCameraLoc, usePerspectiveCamera);
 
         unsigned int useThirdPersonCameraLoc = glGetUniformLocation(sample.shaderProgram, "useThirdPersonCamera");
         glUniform1i(useThirdPersonCameraLoc, useThirdPersonCamera);

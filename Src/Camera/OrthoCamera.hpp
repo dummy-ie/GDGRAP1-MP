@@ -17,7 +17,7 @@ namespace gd
 
     mat4 OrthoCamera::generateProjectionMatrix()
     {
-        return ortho(-10.f, 10.f, -10.f, 10.f, -1.f, 100.f); // fixed values for now since the ortho camera is static anyway
+        return ortho(-(600.f / 4.f), 600.f / 4.f, 600.f / 4.f, -(600.f / 4.f), -200.f, 200.f); // fixed values for now
     }
 } // namespace gd
 

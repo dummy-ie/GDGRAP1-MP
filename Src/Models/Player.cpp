@@ -3,7 +3,7 @@
 using namespace model;
 using namespace glm;
 
-Player::Player(std::string modelPath, std::string texturePath, vec3 color, vec3 pos, vec3 rot, vec3 sca) : Model3D(modelPath, texturePath, color, pos, rot, sca)
+Player::Player(std::string modelPath, std::string texturePath, std::string normalPath, vec3 color, vec3 pos, vec3 rot, vec3 sca) : Model3D(modelPath, texturePath, normalPath, color, pos, rot, sca)
 {
 }
 

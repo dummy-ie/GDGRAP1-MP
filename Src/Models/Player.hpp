@@ -15,7 +15,7 @@ namespace model
             float speed = 0.5f;
 
         public:
-            Player(std::string modelPath, std::string texturePath = "", vec3 color = vec3(1.f), vec3 pos = vec3(0.f), vec3 rot = vec3(0.f), vec3 sca = vec3(1.f));
+            Player(std::string modelPath, std::string texturePath = "", std::string normalPath = "", vec3 color = vec3(1.f), vec3 pos = vec3(0.f), vec3 rot = vec3(0.f), vec3 sca = vec3(1.f));
 
             void directionalMove(bool isForward); 
     };

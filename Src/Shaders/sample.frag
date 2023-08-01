@@ -1,10 +1,12 @@
 #version 330 core
 
 uniform sampler2D tex0;
+uniform sampler2D norm_tex;
 
 uniform vec3 cameraPos;
 uniform vec4 rgba = vec4(1.f);
 
+uniform bool usePerspectiveCamera;
 uniform bool useThirdPersonCamera;
 
 out vec4 FragColor;
@@ -12,6 +14,7 @@ out vec4 FragColor;
 in vec3 normCoord;
 in vec3 fragPos;
 in vec2 texCoord;
+in mat3 TBN;
 
 struct DirLight {
     vec3 direction;
@@ -70,7 +73,9 @@ void main(){
 	// FragColor = rgba;
 
 	// light source info
-	vec3 normal = normalize(normCoord);
+	vec3 normal = texture(norm_tex, texCoord).rgb;
+	normal = normalize(normal * 2.0 - 1.0);
+	normal = normalize(TBN * normal);
 	vec3 viewDir = normalize(cameraPos - fragPos);	
 
 	// calculate texture, direction light, and point light vectors
@@ -115,7 +120,7 @@ void main(){
 
 	if (!useThirdPersonCamera)
 		FragColor *= vec4(0.f, 1.f, 0.f, 1.f); // simple nightvision
-	else
+	else if (usePerspectiveCamera)
 		FragColor = mix(vec4(0.02f, 0.02f, 0.05f, 1.f), FragColor, 1.f - fog_factor);
 }
 
