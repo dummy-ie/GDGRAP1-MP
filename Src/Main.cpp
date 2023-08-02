@@ -375,28 +375,33 @@ int main(void)
         stbi_image_free(data);
     }
 
-    // Voxel Link model from https://skfb.ly/6YJOU
+    // model from https://free3d.com/3d-model/german-wwii-era-heavy-tank-tiger-i-254401.html
     player = new Player("Models/source/tanknew.obj", "Models/texture/tank.jpg", "Models/texture/tank_normal.jpg", vec3(1.f), vec3(0.f, 0.7f, 0.f), vec3(-90.f, 0.f, 0.f), vec3(1.f));
 
     // Among Us character model from https://skfb.ly/6XXwV
     // Model3D amogus("Models/source/among us.obj", "Plastic_4K_Diffuse.jpg", "Plastic_4K_Normal.jpg", vec3(1.f), vec3(0.f, 0.f, -30.f), vec3(0.f, 0.f, 0.f), vec3(0.01f));
     
+    // model from https://www.turbosquid.com/3d-models/fictional-pbr-tank-3d-model-1382107
     Model3D fictionalTank("Models/source/fictionaltank.obj", "Models/texture/fictionaltank.jpg");
     fictionalTank.position = vec3(40.f, 3.f, -5.f);
     fictionalTank.rotation = vec3(-90.f, 0.f, 32.f);
     
+    // model from https://www.turbosquid.com/3d-models/3d-model-of-tank/899695
     Model3D genericTank("Models/source/generictank.obj", "Models/texture/generictank.jpg");
     genericTank.position = vec3(60.f, 3.f, 50.f);
     genericTank.rotation = vec3(-90.f, 0.f, 43.f);
     
+    // model from https://www.turbosquid.com/3d-models/free-3ds-mode-wiesel-2-ozelot-anti-air/361920
     Model3D ozelot("Models/source/ozelot.obj", "Models/texture/ozelot.jpg");
     ozelot.position = vec3(10.f, 3.f, 80.f);
     ozelot.rotation = vec3(-90.f, 0.f, 56.f);
     
+    // model from https://www.turbosquid.com/3d-models/free-sherman-3d-model/949824
     Model3D sherman("Models/source/sherman.obj", "Models/texture/sherman.jpg");
     sherman.position = vec3(-30.f, 3.f, 30.f);
     sherman.rotation = vec3(-90.f, 0.f, 47.f);
     
+    // modified model, original from https://free3d.com/3d-model/t-90a-russian-tank-47395.html
     Model3D t90broken("Models/source/t90broken.obj", "Models/texture/t90broken.png");
     t90broken.position = vec3(-30.f, 1.f, 0.f);
     t90broken.rotation = vec3(-90.f, 0.f, 72.f);
