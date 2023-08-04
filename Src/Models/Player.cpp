@@ -9,7 +9,7 @@ Player::Player(std::string modelPath, std::string texturePath, std::string norma
 
 void Player::directionalMove(bool isForward)
 {
-    if (isForward)
+    if (isForward) // move forward or backward in the direction that the model is facing
     {
         position.x -= sin(glm::radians(rotation.z)) * speed;
         position.z -= cos(glm::radians(rotation.z)) * speed;

@@ -38,7 +38,7 @@ using namespace shader;
 static float height = 600.f;
 static float width = 600.f;
 
-// increment to rotate the models by
+// increment to rotate/translate the models by
 static float positionIncrement = 1.f;
 static float rotationIncrement = 5.f;
 
@@ -58,12 +58,9 @@ static DirectionLight *directionLight;
 
 // if we're using the perspective or ortho camera
 static bool usePerspectiveCamera = true;
-static bool useThirdPersonCamera = true;
+static bool useThirdPersonCamera = true; // if using first or third person
 
-// if we're controlling the center model or the light model
-static bool controlLight = false;
-
-// update the light model's position by rotating it around the origin
+// update the light model's position 
 // (where the main model is) and then setting the point light's position to it as well
 void updateLightPosition()
 {
@@ -223,7 +220,6 @@ static void Cursor_Position_Callback(GLFWwindow *window, double xpos, double ypo
         {
             // some dark magic ritual that works!
             // rotate the camera using the mouse's offset from the center while we keep the mouse at the center of the screen.
-            // translate the camera 10 units away in all directions and negate its (direction) rotation to keep it aimed at the origin (0, 0, 0)
             thirdPersonCamera->rotation.x += 0.1f * float(width / 2 - xpos);
             thirdPersonCamera->rotation.y += 0.1f * float(height / 2 - ypos);
         }
@@ -406,6 +402,7 @@ int main(void)
     t90broken.position = vec3(-30.f, 1.f, 0.f);
     t90broken.rotation = vec3(-90.f, 0.f, 72.f);
 
+    // model from https://skfb.ly/orGPV
     Model3D deadTree("Models/source/DeadTree_LoPoly.obj", "Models/texture/DeadTree_LoPoly_DeadTree_Diffuse.jpg", "Models/texture/DeadTree_LoPoly_DeadTree_Normal.jpg");
     deadTree.position = vec3(-100.f, 1.f, -30.f);
 
@@ -433,15 +430,15 @@ int main(void)
             if (useThirdPersonCamera)
             {
                 glfwSetCursorPos(window, height / 2.f, width / 2.f);
+
+                // translate the camera 10 units away from the player in all directions and negate its (direction) rotation to keep it aimed at the player
                 thirdPersonCamera->position.x = player->position.x - (cos(glm::radians(thirdPersonCamera->rotation.y)) * sin(glm::radians(thirdPersonCamera->rotation.x))) * 10.f;
                 thirdPersonCamera->position.y = (player->position.y + 3.f) - sin(glm::radians(thirdPersonCamera->rotation.y)) * 10.f;
                 thirdPersonCamera->position.z = player->position.z - (cos(glm::radians(thirdPersonCamera->rotation.y)) * cos(glm::radians(thirdPersonCamera->rotation.x))) * 10.f;
 
+                // limit the camera so u can't go through the ground
                 if (thirdPersonCamera->position.y <= 0.1f)
                     thirdPersonCamera->position.y = 0.1f;
-            }
-            else
-            {
             }
         }
 
@@ -536,10 +533,6 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
-
-    // glDeleteVertexArrays(1, &VAO);
-    // glDeleteBuffers(1, &VBO);
-    // glDeleteBuffers(1, &EBO);
 
     glfwTerminate();
     return 0;

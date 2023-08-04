@@ -226,6 +226,7 @@ Model3D::Model3D(std::string modelPath, std::string texturePath, std::string nor
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
+        // check if the image is a .png or .jpg
         if (texturePath.find("png") != std::string::npos)
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img_width, img_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_bytes);
         else if (texturePath.find("jpg") != std::string::npos)
@@ -306,7 +307,7 @@ void Model3D::draw(GLuint &shaderProgram)
     glBindTexture(GL_TEXTURE_2D, texture);
     glUniform1i(tex0Address, 0);
 
-    if (glIsTexture(normalTexture))
+    if (glIsTexture(normalTexture)) // if the model has a normal texture, send it
     {
         GLuint norm_texAddress = glGetUniformLocation(shaderProgram, "norm_tex");
         glActiveTexture(GL_TEXTURE1);

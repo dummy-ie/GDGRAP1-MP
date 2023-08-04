@@ -72,7 +72,7 @@ void main(){
 	// FragColor = vec4(1.0f, 0.72f, 0.77f, 1.0f);
 	// FragColor = rgba;
 
-	// light source info
+	// normal info and view direction from light source
 	vec3 normal = texture(norm_tex, texCoord).rgb;
 	normal = normalize(normal * 2.0 - 1.0);
 	normal = normalize(TBN * normal);
@@ -121,7 +121,7 @@ void main(){
 	if (!useThirdPersonCamera)
 		FragColor *= vec4(0.f, 1.f, 0.f, 1.f); // simple nightvision
 	else if (usePerspectiveCamera)
-		FragColor = mix(vec4(0.02f, 0.02f, 0.05f, 1.f), FragColor, 1.f - fog_factor);
+		FragColor = mix(vec4(0.02f, 0.02f, 0.05f, 1.f), FragColor, 1.f - fog_factor); // fog to limit view distance
 }
 
 vec4 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
