@@ -1,5 +1,6 @@
-Members:	Marcus Leocario
-    		Joachim Arguelles
+Developers	
+- Marcus Leocario
+- Joachim Arguelles
 
 # Elden’s Hill — OpenGL Graphics Project
 
